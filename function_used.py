@@ -4,7 +4,7 @@
 import yfinance as yf
 # About Function get_data_change:
 """get_data_change is a function which actually fetch the price of given stock from yahoo finance """
-def get_data_change(ticker_symbol="AAPL"):
+def stock_data(ticker_symbol="AAPL"):
     stock=yf.Ticker(ticker_symbol)
     stock_closing_price=stock.history(period="1mo")["Close"].diff() # get daily price change data 
     print(stock_closing_price.iloc[-2])
