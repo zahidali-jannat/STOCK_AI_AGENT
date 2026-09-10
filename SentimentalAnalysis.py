@@ -32,14 +32,20 @@ def sentimental_analysis(ticker:str):
         # print(row["rsi"] , row["pct_above_sma"])
         idx = history.index.get_loc(index)
         prices = history.iloc[idx:idx + 31]["Close"]
-        pct_changes=(prices-prices.iloc[0])/prices.iloc[0]*100
-        mean_pct_changes=pct_changes.mean()
-        empty_array.append(mean_pct_changes)
-    points=np.array(empty_array)    
-    print(mean_pct_changes)
-    plt.plot(points)
-    plt.show()
+        pct_changes=(prices.iloc[-1]-prices.iloc[0])/prices.iloc[0]*100
+        empty_array.append(pct_changes)
 
+    # lets check probability 
+    positive_number=0
+    negative_number=0
+    for item in empty_array:
+        if item>0:
+            positive_number=positive_number+1
+        else:
+            negative_number=negative_number+1
+    
+
+    print("Probability of positive return " , positive_number/np.size(empty_array))
     # given_date=filtered_data_frame.index[0] # i wrote .loc[0] which will return the whole row , which was actually creating problem so use .index[0]
     # print(type(given_date))
 
