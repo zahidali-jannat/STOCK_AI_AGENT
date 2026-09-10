@@ -2,28 +2,47 @@ from newsdataapi import NewsDataApiClient
 from dotenv import load_dotenv
 import os
 from langchain_core.tools import tool
+import yfinance as yf
+import matplotlib.pyplot as plt
+from ta.momentum import RSIIndicator
+import pandas as pd
+import numpy as np
 load_dotenv()
-client=NewsDataApiClient(os.environ.get("api_key")) 
-def get_stock_news(ticker:str):
-     """
-    Get recent market-related news for a stock.
-    Use this when the user asks about recent/latest
-    market news, financial news, or stock news for a company.
-    """
-     response=client.market_api(q=ticker , language="en")
-     articles=[]
+     
+def sentimental_analysis(ticker:str):
+    stock=yf.Ticker(ticker)
+    history=stock.history(period="5y")
+    sma_20 = history['Close'].rolling(window=20).mean()
+    history['pct_above_sma'] = (history['Close'] - sma_20) / sma_20 * 100
+    history['rsi'] = RSIIndicator(close=history['Close'], window=14).rsi()
+    current_rsi_value=history['rsi'].iloc[-1]
+    current_pct_changes=history['pct_above_sma'].iloc[-1]
+    print(current_rsi_value)
+    print(current_pct_changes)
+    # Here i created a data frame named Filtered_data_frame which actually stores rsi and pct_above_sma under defined conditions
+    filtered_data_frame=history[history['rsi'].between(48, 52) & history['pct_above_sma'].between(-0.35,1.15)][['rsi' , 'pct_above_sma']]
+    # Print the data frame 
+    print(filtered_data_frame)
+    # print(type(history))
 
-     for article in response.get("results" , []):
-          articles.append(
-               {
-                    "title":article.get("title"),
-                    "description": article.get("description"),
-                    "link": article.get("link"),
-                    "source": article.get("source_name"),
-                    "published": article.get("pubDate")
-               }
-          ) 
+    # This loop is soo important to comprehend 
+    empty_array = []
+    for index , row in filtered_data_frame.iterrows():
+        # print(index)
+        # print(row["rsi"] , row["pct_above_sma"])
+        idx = history.index.get_loc(index)
+        prices = history.iloc[idx:idx + 31]["Close"]
+        pct_changes=(prices-prices.iloc[0])/prices.iloc[0]*100
+        mean_pct_changes=pct_changes.mean()
+        empty_array.append(mean_pct_changes)
+    points=np.array(empty_array)    
+    print(mean_pct_changes)
+    plt.plot(points)
+    plt.show()
 
-     return articles     
+    # given_date=filtered_data_frame.index[0] # i wrote .loc[0] which will return the whole row , which was actually creating problem so use .index[0]
+    # print(type(given_date))
 
-# it returns 
+
+sentimental_analysis("AAPL")     
+

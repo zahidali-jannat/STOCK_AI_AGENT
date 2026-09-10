@@ -58,6 +58,7 @@ def get_52_week_high_low(ticker_symbol:str)->float:
             return "52 Week highest or lowest " , high_52_week ,low_52_week
     except Exception as e:
         return f"Error occured as {e}"
+    
 @tool
 def get_stock_news(ticker:str , limit:str):
      """
@@ -87,6 +88,7 @@ agent=create_agent(
     system_prompt="You are a finance assistant with access to real-time stock prices. "
                    "If the question is about stock prices, use the stock_price tool to get the latest value.",
 )
+
 
 while(True):
     ticker_=input("Enter your ticker sumbol ")
