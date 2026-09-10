@@ -20,20 +20,22 @@ def sentimental_analysis(ticker:str):
     print(current_rsi_value)
     print(current_pct_changes)
     # Here i created a data frame named Filtered_data_frame which actually stores rsi and pct_above_sma under defined conditions
-    filtered_data_frame=history[history['rsi'].between(48, 52) & history['pct_above_sma'].between(-0.35,1.15)][['rsi' , 'pct_above_sma']]
+    filtered_data_frame=history[history['rsi'].between(50, 60) & history['pct_above_sma'].between(2.4,5.6)][['rsi' , 'pct_above_sma']]
     # Print the data frame 
     print(filtered_data_frame)
     # print(type(history))
-
+    if(len(filtered_data_frame)==0):
+       return "Nothing Matched Previously"
     # This loop is soo important to comprehend 
-    empty_array = []
-    for index , row in filtered_data_frame.iterrows():
-        # print(index)
-        # print(row["rsi"] , row["pct_above_sma"])
-        idx = history.index.get_loc(index)
-        prices = history.iloc[idx:idx + 31]["Close"]
-        pct_changes=(prices.iloc[-1]-prices.iloc[0])/prices.iloc[0]*100
-        empty_array.append(pct_changes)
+    else:
+        empty_array = []
+        for index , row in filtered_data_frame.iterrows():
+            # print(index)
+            # print(row["rsi"] , row["pct_above_sma"])
+            idx = history.index.get_loc(index)
+            prices = history.iloc[idx:idx + 31]["Close"]
+            pct_changes=(prices.iloc[-1]-prices.iloc[0])/prices.iloc[0]*100
+            empty_array.append(pct_changes)
 
     # lets check probability 
     positive_number=0
@@ -50,5 +52,5 @@ def sentimental_analysis(ticker:str):
     # print(type(given_date))
 
 
-sentimental_analysis("AAPL")     
+sentimental_analysis("MSFT")     
 
