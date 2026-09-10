@@ -8,7 +8,24 @@ from ta.momentum import RSIIndicator
 import pandas as pd
 import numpy as np
 load_dotenv()
-     
+
+def calculate_baseline(history):
+    # get each date 30 days forward price change 
+    total_size=0
+    positive_change=0
+    for index in history.index[:-30]: # this will exclude atleast last 30 days 
+        idx=history.index.get_loc(index) # getting the index of date which is present in history
+        prices=history.iloc[idx:idx+31]["Close"] # Getting 30 days ahead data 
+        pct_changes=(prices.iloc[-1]-prices.iloc[0])/prices.iloc[0]*100
+        print(index, prices.iloc[0], prices.iloc[-1], pct_changes)
+        total_size+=1
+        if pct_changes > 0:
+            positive_change=positive_change+1
+
+    baseline_win_rate=positive_change/total_size*100
+    return float(baseline_win_rate)
+
+         
 def sentimental_analysis(ticker:str):
     stock=yf.Ticker(ticker)
     history=stock.history(period="5y")
@@ -35,6 +52,7 @@ def sentimental_analysis(ticker:str):
             idx = history.index.get_loc(index)
             prices = history.iloc[idx:idx + 31]["Close"]
             pct_changes=(prices.iloc[-1]-prices.iloc[0])/prices.iloc[0]*100
+            
             empty_array.append(pct_changes)
 
     # lets check probability 
@@ -46,11 +64,15 @@ def sentimental_analysis(ticker:str):
         else:
             negative_number=negative_number+1
     
-
-    print("Probability of positive return " , positive_number/np.size(empty_array))
+    Percentage_of_positive_return=positive_number/np.size(empty_array)*100
+    print("Probability of positive return " ,Percentage_of_positive_return )
+    basline_percentage=calculate_baseline(history)
+    print(basline_percentage)
+    winning_ege=Percentage_of_positive_return - basline_percentage
+    print("Winning edge is " ,winning_ege)
     # given_date=filtered_data_frame.index[0] # i wrote .loc[0] which will return the whole row , which was actually creating problem so use .index[0]
     # print(type(given_date))
+sentimental_analysis("MSFT") 
 
 
-sentimental_analysis("MSFT")     
 
